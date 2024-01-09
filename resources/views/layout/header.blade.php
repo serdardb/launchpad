@@ -6,13 +6,13 @@
                 <img src="{!! asset("assets/img/logo/logo.png") !!}" />
             </a>
 
-            <div class="ml-auto"></div>
+            <div class="d-none ml-auto"></div>
 
             <ul class="navbar-nav items mx-auto">
                 <li class="nav-item">
-                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="{!! url('/') !!}" class="nav-link">Home</a>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="d-none nav-item dropdown">
                     <a href="#" class="nav-link">Projects <i class="icon-arrow-down"></i></a>
                     <ul class="dropdown-menu" style="z-index: 1900;">
                         <li class="nav-item active">
@@ -32,7 +32,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="d-none nav-item dropdown">
                     <a href="#" class="nav-link">Staking <i class="icon-arrow-down"></i></a>
                     <ul class="dropdown-menu">
                         <li class="nav-item">
@@ -43,7 +43,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="d-none nav-item dropdown">
                     <a href="#" class="nav-link">Pages <i class="icon-arrow-down"></i></a>
                     <ul class="dropdown-menu">
                         <li class="nav-item">
@@ -103,11 +103,14 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="javascript:void()" style="display: inline-block" class="nav-link">
+                        <div>Launchpads</div>
+                        <div style="font-size: xx-small;">Coming Soon</div>
+                    </a>
                 </li>
             </ul>
 
-            <ul class="navbar-nav icons">
+            <ul class="d-none navbar-nav icons">
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-toggle="modal" data-target="#search">
                         <i class="icon-magnifier"></i>
@@ -115,7 +118,7 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav toggle">
+            <ul class="d-none navbar-nav toggle">
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-toggle="modal" data-target="#menu">
                         <i class="icon-menu m-0"></i>
@@ -123,7 +126,7 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav action">
+            <ul class="d-none navbar-nav action">
                 <li class="nav-item ml-2">
                     <a href="wallet-connect.html" class="btn ml-lg-auto btn-bordered-white"><i class="icon-wallet mr-md-2"></i>Wallet Connect</a>
                 </li>

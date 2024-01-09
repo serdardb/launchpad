@@ -6,7 +6,7 @@
                     <a class="navbar-brand" href="index.html">
                         <img src="{!! asset("assets/img/logo/logo.png") !!}">
                     </a>
-                    <div class="social-icons d-flex justify-content-center my-4">
+                    <div class="social-icons justify-content-center my-4 d-none">
                         <a class="facebook" href="https://www.facebook.com/" target="_blank">
                             <i class="icon-social-facebook"></i>
                             <i class="icon-social-facebook"></i>
@@ -32,14 +32,14 @@
                             <i class="icon-social-youtube"></i>
                         </a>
                     </div>
-                    <ul class="list-inline">
+                    <ul class="list-inline d-none">
                         <li class="list-inline-item"><a href="tier-system.html">Features</a></li>
                         <li class="list-inline-item"><a href="tokenomics.html">Roadmap</a></li>
                         <li class="list-inline-item"><a href="contact.html">How It Works</a></li>
                         <li class="list-inline-item"><a href="blog.html">Blog</a></li>
                         <li class="list-inline-item"><a href="login.html">Privacy Policy</a></li>
                     </ul>
-                    <div class="copyright-area py-4">&copy;2022 GameOn, All Rights Reserved By <a href="https://themeforest.net/user/theme_land" target="_blank">Themeland</a></div>
+                    <div class="d-none copyright-area py-4">&copy;2022 GameOn, All Rights Reserved By <a href="https://themeforest.net/user/theme_land" target="_blank">Themeland</a></div>
                 </div>
                 <div id="scroll-to-top" class="scroll-to-top">
                     <a href="#header" class="smooth-anchor">
