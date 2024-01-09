@@ -68,16 +68,5 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    {
-    "repositories": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/serdardb/launchpad"
-        }
-    ],
-    "require": {
-        "serdardb/launchpad": "dev-master"
-      }
-    }
+    "prefer-stable": true
 }
