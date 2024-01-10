@@ -20,7 +20,7 @@ class LaunchpadSeeder extends Seeder
                 'url' => 'https://daomaker.com/launchpad',
                 'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/8420.png',
                 'pad' => 'dao_maker',
-                'status' => 1
+                'status' => 0
             ],
             [
                 'name' => 'Seedify',
@@ -76,6 +76,13 @@ class LaunchpadSeeder extends Seeder
                 'url' => 'https://app.seapad.fund/',
                 'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/26655.png',
                 'pad' => 'seapad',
+                'status' => 1
+            ],
+            [
+                'name' => 'BinStarter',
+                'url' => 'https://bsr.binstarter.io/ido/projects',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/11275.png',
+                'pad' => 'bin_starter',
                 'status' => 1
             ]
         ];
