@@ -69,6 +69,7 @@ export default {
             return this.formatDateWithTime(date).split(' ')[1];
         },
         formatDateWithTime(date) {
+            if (date === "TBA") return "TBA";
             const parsedDate = new Date(date);
             return parsedDate.toLocaleString();
         },
