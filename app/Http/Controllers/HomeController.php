@@ -46,7 +46,13 @@ class HomeController extends Controller
         $today = Carbon::now()->format('Y-m-d H:i:s');
 
         $subQuery = DB::table('launchpad_product as lp_inner')
-            ->select('lp_inner.product_id', DB::raw('MIN(lp_inner.start_date) as earliest_start_date'))
+            ->select('lp_inner.product_id')
+            ->selectRaw("MIN(CASE
+                     WHEN lp_inner.start_date > ? THEN lp_inner.start_date
+                     WHEN lp_inner.start_date = 'TBA' THEN '2999-12-31 23:59:59'
+                     ELSE '1000-01-01 00:00:00'
+                 END) as earliest_start_date", [$today])
+            ->where('lp_inner.start_date', ">" , $today)
             ->groupBy('lp_inner.product_id');
 
 
@@ -55,14 +61,17 @@ class HomeController extends Controller
                 'lp.*',
                 DB::raw('(SELECT GROUP_CONCAT(launchpad_id) FROM launchpad_product WHERE product_id = lp.product_id) as launchpad_ids')
             )
-            ->leftJoin('products', 'lp.product_id', '=', 'products.id')
-            ->leftJoin('launchpads', 'lp.launchpad_id', '=', 'launchpads.id')
-            ->joinSub($subQuery, 'sub', function ($join) {
-                $join->on('lp.product_id', '=', 'sub.product_id')
-                    ->on('lp.start_date', '=', 'sub.earliest_start_date');
+            ->where('lp.status', 1)
+            ->where(function($query) use ($today) {
+                $query->where('lp.start_date', 'TBA')
+                    ->orWhere('lp.start_date', '>=', $today);
             })
-            ->whereRaw("(lp.start_date = 'TBA' OR lp.start_date > ?)", [$today]);
-
+            ->leftJoin('products', 'lp.product_id', '=', 'products.id')
+            ->leftJoin('launchpads', 'lp.launchpad_id', '=', 'launchpads.id');
+        $query->joinSub($subQuery, 'sub', function ($join) {
+            $join->on('lp.product_id', '=', 'sub.product_id')
+                ->on('lp.start_date', '=', 'sub.earliest_start_date');
+        });
         $productQuery = null;
         if ($request->token) {
             $productQuery = Product::where('token', '=', $request->token)
@@ -80,6 +89,9 @@ class HomeController extends Controller
         }
         if ($request->launchpadId) {
             $query = $query->where('launchpad_id', $request->launchpadId);
+        } else {
+            $launchpadIds = Launchpad::where('status', 1)->get()->pluck('id');
+            $query = $query->whereIn('launchpad_id', $launchpadIds->toArray());
         }
         if ($request->excludeTBA) {
             $filter = filter_var($request->excludeTBA, FILTER_VALIDATE_BOOLEAN);
@@ -91,8 +103,8 @@ class HomeController extends Controller
                 WHEN lp.start_date = 'TBA' THEN 1
                 WHEN lp.start_date > ? THEN 0
                 ELSE 2
-            END", [Carbon::now()])
-            ->orderBy('lp.start_date', 'desc')->groupBy('product_id');
+            END", [$today])
+            ->orderBy('lp.start_date', 'asc')->groupBy('product_id');
         $data = $query->paginate(10);
         foreach ($data as $key => $item) {
             $product = Product::find($item->product_id);

@@ -84,6 +84,13 @@ class LaunchpadSeeder extends Seeder
                 'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/11275.png',
                 'pad' => 'bin_starter',
                 'status' => 1
+            ],
+            [
+                'name' => 'Enjinstarter',
+                'url' => 'https://launchpad.enjinstarter.com/',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/11088.png',
+                'pad' => 'enjinstarter',
+                'status' => 1
             ]
         ];
         foreach ($launchpads as $launchpad)
