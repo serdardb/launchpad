@@ -2,7 +2,7 @@
     <nav data-aos="zoom-out" data-aos-delay="800" class="navbar gameon-navbar navbar-expand relative" style="background-color: #121117; z-index: 1500;">
         <div class="container header">
 
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="{!! url('/') !!}">
                 <img src="{!! asset("assets/img/logo/logo.png") !!}" />
             </a>
 
