@@ -46,7 +46,7 @@
                 <div
                     class="project-content d-md-flex flex-column flex-md-row align-items-center justify-content-md-between">
                     <div class="col-3 item-header d-flex align-items-center mb-4 mb-md-0">
-                        <img class="card-img-top avatar-md" :src="asset(product.icon)" alt="Product Icon">
+                        <img class="card-img-top avatar-md" :src="asset(product.icon)" :alt="capitalized(product.name)">
                         <div class="content ml-4 text-light">
                             <p class="m-0 text-truncate">{{ capitalized(product.name) }}</p>
                             <p class="small mt-0 mb-0">Token: ${{ product.token.toUpperCase() }}</p>

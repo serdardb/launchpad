@@ -120,7 +120,12 @@ class HomeController extends Controller
 
     public function product(Product $product)
     {
-        dd($product);
+
+        return Inertia::render('Product',[
+            'product' => $product,
+            'details' => $product->launchpadProducts()->with('launchpad')->get()
+        ]);
+
     }
 
 }
