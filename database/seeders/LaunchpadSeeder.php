@@ -88,7 +88,7 @@ class LaunchpadSeeder extends Seeder
         ];
         foreach ($launchpads as $launchpad)
         {
-            Launchpad::create($launchpad);
+            Launchpad::firstOrCreate($launchpad);
         }
     }
 }

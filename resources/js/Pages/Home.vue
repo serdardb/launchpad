@@ -63,8 +63,8 @@
                         </div>
                     </div>
                     <div class="col-2 small text-center">
-                        {{ formatDate(product.launchpads[0].pivot.end_date) }}<br>
-                        <span style="font-size: smaller">{{ formatTime(product.launchpads[0].pivot.end_date) }}</span>
+                        {{ formatDate(product.end_date) }}<br>
+                        <span style="font-size: smaller">{{ formatTime(product.end_date) }}</span>
                     </div>
                     <div class="col-2 text-truncate">
                         <p class="single-item" style="width: initial">
@@ -73,12 +73,10 @@
                                 <span>Max: {{ product.maxPrice }}</span>
                             </template>
                             <template v-else>
-                                <span>Price: {{ product.launchpads[0].pivot.price }}</span>
+                                <span>Price: {{ product.price }}</span>
                             </template>
                         </p>
                     </div>
-
-
                     <div class="col-2">
                         <p class="single-item">
                             <template v-if="product.minRaise !== product.maxRaise">
@@ -86,12 +84,12 @@
                                 <span>Max: {{ formatNumber(product.maxRaise) }}</span>
                             </template>
                             <template v-else>
-                                <span>Raise: {{ formatNumber(product.launchpads[0].pivot.raise) }}</span>
+                                <span>Raise: {{ formatNumber(product.raise) }}</span>
                             </template>
                         </p>
                     </div>
                 </div>
-                <a class="project-link" href="#"></a>
+                <Link class="project-link" :href="'/product/' + product.id "></Link>
             </div>
         </div>
     </div>
@@ -138,12 +136,14 @@
 <script>
 
 import {ref, reactive, computed} from 'vue';
-import { router } from "@inertiajs/vue3";
-
-
+import { router, Link } from "@inertiajs/vue3";
 
 export default {
     props: ['products', 'networks', 'launchpads', 'links'],
+    components: {
+        Link,
+        router
+    },
     mounted() {
         this.initializeFiltersFromQueryParams();
     },

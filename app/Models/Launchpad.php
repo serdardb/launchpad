@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Launchpad extends Model
 {
@@ -23,5 +24,10 @@ class Launchpad extends Model
     public function scopeActive($query)
     {
         return $query->where('status', true);
+    }
+
+    public function launchpadProducts(): HasMany
+    {
+        return $this->hasMany(LaunchpadProduct::class);
     }
 }
