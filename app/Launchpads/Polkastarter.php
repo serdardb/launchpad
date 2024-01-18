@@ -35,27 +35,31 @@ class Polkastarter extends LaunchpadAbstract
         foreach ($response['data'] as $data)
         {
             $chain = 'undefined';
+            $website = null;
+            if (isset($data['content']['socials'])) {
+                $website = $data['content']['socials'][0]['url'];
+            }
 
             if (isset($data['chains'][0])) {
                 $chain = $this->product->network_mapping($data['chains'][0]);
             }
 
             $product = $this->product->product(
-                $data['name'],
-                $this->product->token_clear($data['token_symbol']),
+                $data['content']['name'],
+                $this->product->token_clear($data['content']['tokenSymbol'] ?? 'TBA'),
                 $chain,
-                "https://polkastarter.com/_next/image?url=" . urlencode($data['logo']['url']) . '&w=256&q=70',
-                null
+                $data['content']['logo']['url'],
+                $website
             );
             $activeProducts->push($product);
 
             $this->product->run([
                 'launchpad' => class_basename(self::class),
-                'price' => $data['prospect_usd_token_price'] ?? 'TBA',
-                'raise' => $data['total_raise'] ?? 0,
+                'price' => count($data['content']['Sales']) ? $data['content']['Sales'][0] : 'TBA',
+                'raise' => $data['content']['totalRaise'] ?? 0,
                 'offering_type' => $data['type'],
-                'start_date' => $data['ido_starts_at'] ?? 'TBA',
-                'end_date' => $data['ido_ends_at'] ?? 'TBA',
+                'start_date' => $data['content']['startDate'] ?? 'TBA',
+                'end_date' => $data['content']['endDate'] ?? 'TBA',
                 'product' => $product
             ]);
         }

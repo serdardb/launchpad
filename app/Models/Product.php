@@ -34,6 +34,7 @@ class Product extends Model
     public function launchpads(): BelongsToMany
     {
         return $this->belongsToMany(Launchpad::class, 'launchpad_product', 'product_id', 'launchpad_id')
+            ->where('launchpads.status', 1) // 'launchpad' tablosundaki 'status' sütunu için şart
             ->distinct();
     }
 

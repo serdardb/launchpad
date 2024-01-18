@@ -2,142 +2,127 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Launchpad;
-use App\Models\LaunchpadProduct;
-use App\Models\Product;
+use App\Models\Project;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 
 class HomeController extends Controller
 {
-    public function indexold(): Response
-    {
 
-        $products = Product::select('products.*')
-            ->join('launchpad_product', 'products.id', '=', 'launchpad_product.product_id')
-            ->where('launchpad_product.status', 1)
-            ->orderByRaw("CASE
-                WHEN launchpad_product.end_date LIKE 'TBA' THEN 1
-                WHEN launchpad_product.end_date >= NOW() THEN 0
-                ELSE 2
-            END, launchpad_product.end_date")
-            ->groupBy('products.id')
-            ->with('launchpads')
-            ->has('launchpads')
-            ->get()
-            ->map(function ($e) {
-                $e->minPrice = $e->minPrice;
-                $e->maxPrice = $e->maxPrice;
-                $e->minRaise = $e->minRaise;
-                $e->maxRaise = $e->maxRaise;
-                return $e;
-            });
-        return Inertia::render('Home', [
-            'products' => $products,
+    public function home(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        return view('home');
+    }
+
+    public function listings(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        return view('listings');
+    }
+
+    public function soon(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        return view('soon');
+    }
+
+    public function project(Project $project, $slug): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        if ($project->token !== $slug) abort(404);
+        $today = Carbon::today();
+
+        $listings = $project->listings()->with('launchpad')->has('launchpad')
+            ->orderByRaw("
+                CASE
+                    WHEN start_date IS NULL THEN 1
+                    WHEN start_date < '{$today}' THEN 2
+                    ELSE 0
+                END ASC,
+                ABS(DATEDIFF(start_date, '{$today}'))
+            ")->get();
+        return view('project', [
+            'project' => $project,
+            'listings' => $listings
         ]);
     }
 
-    public function index(Request $request): Response
+   /* public function index(Request $request): Response
     {
 
-        $today = Carbon::now()->format('Y-m-d H:i:s');
+        $today = Carbon::today();
+        $token = $request->token;
+        $network = $request->network;
+        $launchpadId = request('launchpadId');
 
-        $subQuery = DB::table('launchpad_product as lp_inner')
-            ->select('lp_inner.product_id')
-            ->selectRaw("MIN(CASE
-                     WHEN lp_inner.start_date > ? THEN lp_inner.start_date
-                     WHEN lp_inner.start_date = 'TBA' THEN '2999-12-31 23:59:59'
-                     ELSE '1000-01-01 00:00:00'
-                 END) as earliest_start_date", [$today])
-            ->where('lp_inner.start_date', ">" , $today)
-            ->groupBy('lp_inner.product_id');
-
-
-        $query = DB::table('launchpad_product as lp')
-            ->select(
-                'lp.*',
-                DB::raw('(SELECT GROUP_CONCAT(launchpad_id) FROM launchpad_product WHERE product_id = lp.product_id) as launchpad_ids')
-            )
-            ->where('lp.status', 1)
-            ->where(function($query) use ($today) {
-                $query->where('lp.start_date', 'TBA')
-                    ->orWhere('lp.start_date', '>=', $today);
+        $projects = Project::select('projects.*')
+            ->leftJoin(DB::raw('(SELECT * FROM listings WHERE start_date >= "'.$today.'" OR start_date IS NULL) as filtered_listings'), function($join) {
+                $join->on('projects.id', '=', 'filtered_listings.project_id');
             })
-            ->leftJoin('products', 'lp.product_id', '=', 'products.id')
-            ->leftJoin('launchpads', 'lp.launchpad_id', '=', 'launchpads.id');
-        $query->joinSub($subQuery, 'sub', function ($join) {
-            $join->on('lp.product_id', '=', 'sub.product_id')
-                ->on('lp.start_date', '=', 'sub.earliest_start_date');
-        });
-        $productQuery = null;
-        if ($request->token) {
-            $productQuery = Product::where('token', '=', $request->token)
-                ->orWhere('name', 'LIKE','%'.$request->token.'%');
-        }
-        if ($request->network) {
-            if ($productQuery) {
-                $productQuery = $productQuery->where('network', '=', $request->network);
-            } else {
-                $productQuery = Product::where('network', '=', $request->network);
-            }
-        }
-        if ($productQuery) {
-            $query = $query->whereRaw('lp.product_id IN (' . implode(',', $productQuery->get()->pluck('id')->toArray()) . ')');
-        }
-        if ($request->launchpadId) {
-            $query = $query->where('launchpad_id', $request->launchpadId);
-        } else {
-            $launchpadIds = Launchpad::where('status', 1)->get()->pluck('id');
-            $query = $query->whereIn('launchpad_id', $launchpadIds->toArray());
-        }
-        if ($request->excludeTBA) {
-            $filter = filter_var($request->excludeTBA, FILTER_VALIDATE_BOOLEAN);
-            if ($filter) {
-                $query = $query->where('lp.end_date', '!=', 'TBA');
-            }
-        }
-        $query->orderByRaw("CASE
-                WHEN lp.start_date = 'TBA' THEN 1
-                WHEN lp.start_date > ? THEN 0
-                ELSE 2
-            END", [$today])
-            ->orderBy('lp.start_date', 'asc')->groupBy('product_id');
-        $data = $query->paginate(10);
-        foreach ($data as $key => $item) {
-            $product = Product::find($item->product_id);
-            $sub = $product;
-            $sub->minPrice = $product->minPrice;
-            $sub->maxPrice = $product->maxPrice;
-            $sub->minRaise = $product->minRaise;
-            $sub->maxRaise = $product->maxRaise;
-            $launchpadIds = explode(',',$item->launchpad_ids);
-            $sub->launchpads = Launchpad::whereIn('id', $launchpadIds)->where('status',1)->get();
-            $sub->start_date = $item->start_date;
-            $sub->end_date = $item->end_date;
-            $sub->offering_type = $item->offering_type;
-            $sub->price = $item->price;
-            $sub->raise = $item->raise;
-            $data[$key] = $sub;
-        }
+            ->selectRaw('MIN(COALESCE(filtered_listings.start_date)) as earliest_start_date')
+            ->groupBy('projects.id')
+            ->orderByRaw('ISNULL(earliest_start_date) ASC')
+            ->orderBy('earliest_start_date', 'ASC')
+            ->when($token, function ($query) use ($token) {
+                return $query->where(function($query) use ($token) {
+                    $query->where('projects.name', 'LIKE', "%$token%")
+                        ->orWhere('projects.token', 'LIKE', "%$token%");
+                });
+            })
+            ->when($network, function ($query) use ($network) {
+                return $query->where('projects.network', $network);
+            })
+            ->when($launchpadId, function ($query) use ($launchpadId) {
+                return $query->whereHas('listings.launchpad', function ($query) use ($launchpadId) {
+                    $query->where('id', $launchpadId);
+                });
+            })
+            ->whereHas('listings', function ($query) use($today) {
+                return $query->whereNull('start_date')
+                    ->orWhere('start_date', '>=', $today); // Sonra tarihe göre artan sıralama;
+            })
+            ->with([
+                'listings' => function($query) use($today) {
+                    return $query->whereNull('start_date')
+                        ->orWhere('start_date', '>=', $today)
+                        ->orderByRaw('ISNULL(start_date) ASC') // Önce null olmayanlar
+                        ->orderBy('start_date', 'ASC')
+                        ->with('launchpad');
+                }
+            ])->has('listings')
+            ->paginate(10);
 
+        foreach ($projects as $key => $item) {
+            $product = $item;
+            $sub = $product;
+            $sub->icon = $product->image;
+            $sub->minPrice = 0;
+            $sub->maxPrice = 0;
+            $sub->minRaise = 0;
+            $sub->maxRaise = 0;
+            $uniqueLaunchpads = $product->listings->pluck('launchpad')->unique('id')->values();
+            $sub->launchpads = $uniqueLaunchpads;
+            $sub->start_date = $product->listings->first()->start_date;
+            $sub->end_date = $product->listings->first()->end_date;
+            $sub->offering_type = 'Public';
+            $sub->price = $product->listings->first()->price;
+            $sub->raise = $product->listings->first()->raise;
+            $projects[$key] = $sub;
+        }
         return Inertia::render('Home', [
-            'products' => $data,
+            'products' => $projects,
             'networks' => Product::select('network')->distinct()->get()->pluck('network'),
             'launchpads' => Launchpad::where('status', 1)->get(),
         ]);
     }
 
-    public function product(Product $product)
+    public function product(Product $product): Response
     {
 
-        return Inertia::render('Product',[
+        return Inertia::render('Product', [
             'product' => $product,
             'details' => $product->launchpadProducts()->with('launchpad')->get()
         ]);
 
-    }
+    }*/
 
 }
