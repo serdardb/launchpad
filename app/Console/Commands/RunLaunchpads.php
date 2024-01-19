@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Product;
+use App\Models\Project;
 use App\Services\ProductService;
 use Illuminate\Console\Command;
 use App\Models\Launchpad;
@@ -25,7 +25,7 @@ class RunLaunchpads extends Command
             $classPath = $this->getLaunchpadClassPath($launchpad->pad);
 
             if (class_exists($classPath)) {
-                $launchpadService->addLaunchpad(new $classPath(new ProductService(new Product)));
+                $launchpadService->addLaunchpad(new $classPath(new ProductService(new Project())));
             } else {
                 $this->error("Class not found for {$launchpad->pad}");
             }

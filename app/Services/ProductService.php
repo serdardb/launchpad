@@ -4,15 +4,15 @@ namespace App\Services;
 
 use App\Models\Launchpad;
 use App\Models\LaunchpadProduct;
-use App\Models\Product;
+use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductService
 {
-    protected Product $model;
+    protected Project $model;
 
-    public function __construct(Product $product)
+    public function __construct(Project $product)
     {
         $this->model = $product;
     }
@@ -43,35 +43,36 @@ class ProductService
         return Launchpad::where('pad', Str::snake($key))->first();
     }
 
-    private function launchpad_product($launchpad, $product, $array): void
+    private function launchpad_product($launchpad, $project, $array): void
     {
         $price = $array['price'];
         $raise = intval($array['raise']);
-        $offeringType = $array['offering_type'];
-        $startDate = $array['start_date'] ?? null;
-        $endDate = $array['end_date'] ?? null;
+        //$offeringType = $array['offering_type'];
+        $startDate = null; $endDate = null;
+        if (isset($array['start_date']) and  Str::upper($array['start_date']) !== "TBA") $startDate = $array['start_date'];
+        if (isset($array['end_date']) and  Str::upper($array['end_date']) !== "TBA") $endDate = $array['end_date'];
 
-        $launchpadProduct = DB::table('launchpad_product')
+        $launchpadProduct = DB::table('listings')
             ->where('launchpad_id', $launchpad->id)
-            ->where('product_id', $product->id)
+            ->where('project_id', $project->id)
             ->where('price', $price)
             ->where('raise', $raise)
-            ->where('offering_type', $offeringType)
+            //->where('offering_type', $offeringType)
             ->first();
         if ($launchpadProduct) {
-            DB::table('launchpad_product')
+            DB::table('listings')
                 ->where('id', $launchpadProduct->id)
                 ->update([
                     'start_date' => $startDate,
                     'end_date' => $endDate,
                 ]);
         } else {
-            DB::table('launchpad_product')->insert([
+            DB::table('listings')->insert([
                 'launchpad_id' => $launchpad->id,
-                'product_id' => $product->id,
+                'project_id' => $project->id,
                 'price' => $price,
                 'raise' => $raise,
-                'offering_type' => $offeringType,
+                //'offering_type' => $offeringType,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'created_at' => now(),

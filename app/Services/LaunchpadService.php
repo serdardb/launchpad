@@ -39,13 +39,15 @@ class LaunchpadService
         }
 
         $this->executeMultiCurl($mh);
-
         // Yanıtlar toplanır
         foreach ($multiCurlHandles as $index => $handle) {
-            $response = curl_multi_getcontent($handle);
+            $rawResponse = curl_multi_getcontent($handle);
+            list($header, $body) = explode("\r\n\r\n", $rawResponse, 2);
+            $request = curl_getinfo($handle);
+            $request['header'] = $header;
             $responses[$index] = [
-                'response' => $response,
-                'request' => curl_getinfo($handle),
+                'response' => $body,
+                'request' => $request,
                 'time' => curl_getinfo($handle, CURLINFO_TOTAL_TIME)
             ];
             curl_multi_remove_handle($mh, $handle);
@@ -94,13 +96,13 @@ class LaunchpadService
         curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HEADER, true);
 
         if (isset($requestData['options'])) {
             foreach ($requestData['options'] as $option => $value) {
                 curl_setopt($ch, $option, $value);
             }
         }
-
         return $ch;
     }
 
