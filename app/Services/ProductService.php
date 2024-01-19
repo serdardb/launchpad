@@ -31,7 +31,7 @@ class ProductService
                 'name' => $name,
                 'token' => $token,
                 'network' => $network,
-                'icon' => $icon,
+                'image' => $icon,
                 'website' => $website,
             ]);
         }
