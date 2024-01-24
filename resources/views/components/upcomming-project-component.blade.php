@@ -17,21 +17,21 @@
                     <div class="col-2">
                         <div class="cs-card_media">
                             <div class="cs-card_media_right">
-                                <h3>Project</h3>
+                                <h3>{{ trans('general.projects') }}</h3>
                             </div>
                         </div>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>Launchpads</h3>
+                        <h3>{{ trans('general.launchpads') }}</h3>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>Start Date</h3>
+                        <h3>{{ trans('general.start_date') }}</h3>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>End Date</h3>
+                        <h3>{{ trans('general.end_date') }}</h3>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>Price - Raise</h3>
+                        <h3>{{ trans('general.price_raise') }}</h3>
                     </div>
                     <div class="col-2 d-flex justify-content-end text-right"></div>
                 </div>
@@ -46,7 +46,7 @@
                                     <img src="{!! asset($project->image) !!}" alt="Avatar">
                                 </div>
                                 <div class="cs-card_media_right">
-                                    <h3>{!! \Illuminate\Support\Str::ucfirst($project->name) !!}</h3>
+                                    <h3>{!! \Illuminate\Support\Str::title($project->name) !!}</h3>
                                     <p>${!! \Illuminate\Support\Str::upper($project->token) !!}</p>
                                 </div>
                             </div>

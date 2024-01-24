@@ -1,6 +1,20 @@
 @extends('app')
 @section('content')
-    <div class="cs-height_100 cs-height_lg_70"></div>
+    <div class="cs-height_90 cs-height_lg_80"></div>
+    <!-- Start Page Head -->
+    <section class="pt-4 pb-3 cs-bg" data-src="/assets/img/page_head_bg.svg">
+        <div class="container">
+            <div class="text-center">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ trans('menu.home') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('listings') }}">{{ trans('menu.listings') }}</a> </li>
+                    <li class="breadcrumb-item active">{{ \Illuminate\Support\Str::title($project->name) }} - ${{ \Illuminate\Support\Str::upper($project->token) }}</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <div class="cs-height_30"></div>
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -12,7 +26,7 @@
                             <img src="{{ $project->image }}" alt="Avatar">
                         </div>
                         <div class="cs-card_media_right">
-                            <h3>{{ \Illuminate\Support\Str::ucfirst($project->name) }}</h3>
+                            <h3>{{ \Illuminate\Support\Str::title($project->name) }}</h3>
                             <p>${{ \Illuminate\Support\Str::upper($project->token) }}</p>
                         </div>
                     </div>

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Launchpad;
+use App\Models\Listing;
 use App\Models\Project;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
@@ -26,6 +28,34 @@ class HomeController extends Controller
         return view('soon');
     }
 
+    public function launchpads(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        return view('launchpads',[
+            'launchpads' => Launchpad::where('status',1)->orderBy('name')->get()
+        ]);
+
+    }
+
+    public function launchpad(Launchpad $launchpad): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        $today = Carbon::now();
+        $listings = $launchpad->listings()->with('project')->has('project')
+            ->orderByRaw("
+                CASE
+                    WHEN end_date IS NULL THEN 1
+                    WHEN end_date < '{$today}' THEN 2
+                    ELSE 0
+                END ASC,
+                ABS(DATEDIFF(end_date, '{$today}'))
+            ")
+            ->get();
+
+        return view('launchpad', [
+            'launchpad' => $launchpad,
+            'listings' => $listings
+        ]);
+    }
+
     public function project(Project $project, $slug): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
         if ($project->token !== $slug) abort(404);
@@ -34,13 +64,14 @@ class HomeController extends Controller
         $listings = $project->listings()->with('launchpad')->has('launchpad')
             ->orderByRaw("
                 CASE
-                    WHEN start_date IS NULL THEN 1
-                    WHEN start_date < '{$today}' THEN 2
+                    WHEN end_date IS NULL THEN 1
+                    WHEN end_date < '{$today}' THEN 2
                     ELSE 0
-                END DESC,
-                ABS(DATEDIFF(start_date, '{$today}'))
+                END ASC,
+                ABS(DATEDIFF(end_date, '{$today}'))
             ")
             ->get();
+
         return view('project', [
             'project' => $project,
             'listings' => $listings

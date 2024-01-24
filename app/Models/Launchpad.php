@@ -30,4 +30,9 @@ class Launchpad extends Model
     {
         return $this->hasMany(LaunchpadProduct::class);
     }
+
+    public function listings(): HasMany
+    {
+        return $this->hasMany(Listing::class);
+    }
 }

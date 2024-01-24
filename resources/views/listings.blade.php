@@ -1,6 +1,18 @@
 @extends('app')
 
 @section('content')
+    <div class="cs-height_90 cs-height_lg_80"></div>
+    <!-- Start Page Head -->
+    <section class="pt-4 pb-3 cs-bg" data-src="/assets/img/page_head_bg.svg">
+        <div class="container">
+            <div class="text-center">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ trans('menu.home') }}</a></li>
+                    <li class="breadcrumb-item active">{{ trans('menu.listings') }}</li>
+                </ol>
+            </div>
+        </div>
+    </section>
 
     <x-listing-component></x-listing-component>
 

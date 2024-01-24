@@ -1,4 +1,4 @@
-<div class="cs-height_95 cs-height_lg_70"></div>
+<div class="cs-height_30"></div>
 <!-- Start Category -->
 <section>
     <div class="container">
@@ -25,7 +25,7 @@
                             <select name="network" class="cs-form_field cs-field_sm">
                                 <option value="">{{ trans('project.form.network') }}</option>
                                 @foreach($networks as $network)
-                                    <option value="{{ $network  }}" {{ request()->network == $network ? 'selected' : '' }}>{{ \Illuminate\Support\Str::ucfirst($network) }}</option>
+                                    <option value="{{ $network  }}" {{ request()->network == $network ? 'selected' : '' }}>{{ \Illuminate\Support\Str::title($network) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -35,7 +35,7 @@
                             <select name="launchpad" class="cs-form_field cs-field_sm">
                                 <option value="">{{ trans('project.form.launchpad') }}</option>
                                 @foreach($launchpads as $launchpad)
-                                    <option value="{{ $launchpad->id  }}" {{ request()->launchpad == $launchpad->id ? 'selected' : '' }}>{{ \Illuminate\Support\Str::ucfirst($launchpad->name) }}</option>
+                                    <option value="{{ $launchpad->id  }}" {{ request()->launchpad == $launchpad->id ? 'selected' : '' }}>{{ \Illuminate\Support\Str::title($launchpad->name) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -56,21 +56,21 @@
                     <div class="col-2">
                         <div class="cs-card_media">
                             <div class="cs-card_media_right">
-                                <h3>Project</h3>
+                                <h3>{{ trans('general.projects') }}</h3>
                             </div>
                         </div>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>Launchpads</h3>
+                        <h3>{{ trans('general.launchpads') }}</h3>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>Start Date</h3>
+                        <h3>{{ trans('general.start_date') }}</h3>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>End Date</h3>
+                        <h3>{{ trans('general.end_date') }}</h3>
                     </div>
                     <div class="col-2 text-center">
-                        <h3>Price - Raise</h3>
+                        <h3>{{ trans('general.price_raise') }}</h3>
                     </div>
                     <div class="col-2 d-flex justify-content-end text-right"></div>
                 </div>
@@ -87,7 +87,7 @@
                                     <img src="{!! asset($project->image) !!}" alt="Avatar">
                                 </div>
                                 <div class="cs-card_media_right">
-                                    <h3>{!! \Illuminate\Support\Str::ucfirst($project->name) !!}</h3>
+                                    <h3>{!! \Illuminate\Support\Str::title($project->name) !!}</h3>
                                     <p>${!! \Illuminate\Support\Str::upper($project->token) !!}</p>
                                 </div>
                             </div>

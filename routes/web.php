@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/',  [HomeController::class, 'home'])->name('home');
 Route::get('/listings',  [HomeController::class, 'listings'])->name('listings');
-Route::get('/launchpads',  [HomeController::class, 'soon'])->name('launchpads');
+Route::get('/launchpads',  [HomeController::class, 'launchpads'])->name('launchpads');
+Route::get('/launchpad/{launchpad}/{slug}',  [HomeController::class, 'launchpad'])->name('launchpad');
 Route::get('/contact',  [HomeController::class, 'soon'])->name('contact');
 Route::get('/project/{project}/{slug}',  [HomeController::class, 'project'])->name('project');
 
