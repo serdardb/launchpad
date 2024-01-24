@@ -3,18 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\Launchpad;
-use App\Models\Listing;
 use App\Models\Project;
+use Butschster\Head\Contracts\MetaTags\MetaInterface;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
+    protected MetaInterface $meta;
 
+    public function __construct(MetaInterface $meta)
+    {
+        $this->meta = $meta;
+    }
     public function home(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
+        $this->meta
+            ->prependTitle(trans('seo.home.title'))
+            ->setDescription(trans('seo.home.description'))
+            ->setKeywords(trans('seo.home.keywords'))
+            ->addMeta('twitter:card', ['content' => 'summary_large_image',])
+            ->addMeta('twitter:title',['content' => trans('seo.home.title')])
+            ->addMeta('twitter:description',['content' => trans('seo.home.description')])
+            ->addMeta('twitter:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:title',['content' => trans('seo.home.title')])
+            ->addMeta('og:description',['content' => trans('seo.home.description')])
+            ->addMeta('og:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:url', ['content' => route('home')])
+            ->addMeta('og:type', ['content' => 'website'])
+            ->includePackages('twitter');
         return view('home');
     }
 
@@ -30,6 +50,20 @@ class HomeController extends Controller
 
     public function launchpads(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
+        $this->meta
+            ->prependTitle(trans('seo.launchpads.title'))
+            ->setDescription(trans('seo.launchpads.description'))
+            ->setKeywords(trans('seo.launchpads.keywords'))
+            ->addMeta('twitter:card', ['content' => 'summary_large_image',])
+            ->addMeta('twitter:title',['content' => trans('seo.launchpads.title')])
+            ->addMeta('twitter:description',['content' => trans('seo.launchpads.description')])
+            ->addMeta('twitter:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:title',['content' => trans('seo.launchpads.title')])
+            ->addMeta('og:description',['content' => trans('seo.launchpads.description')])
+            ->addMeta('og:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:url', ['content' => route('launchpads')])
+            ->addMeta('og:type', ['content' => 'website'])
+            ->includePackages('twitter');
         return view('launchpads',[
             'launchpads' => Launchpad::where('status',1)->orderBy('name')->get()
         ]);
@@ -38,6 +72,21 @@ class HomeController extends Controller
 
     public function launchpad(Launchpad $launchpad): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
+        $this->meta
+            ->prependTitle(trans('seo.launchpad.title', ['launchpad' => $launchpad->name]))
+            ->setDescription(trans('seo.launchpad.description', ['launchpad' => $launchpad->name]))
+            ->setKeywords(trans('seo.launchpad.keywords', ['launchpad' => $launchpad->name]))
+            ->addMeta('twitter:card', ['content' => 'summary_large_image'])
+            ->addMeta('twitter:title',['content' => trans('seo.launchpad.title', ['launchpad' => $launchpad->name])])
+            ->addMeta('twitter:description',['content' => trans('seo.launchpad.description', ['launchpad' => $launchpad->name])])
+            ->addMeta('twitter:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:title',['content' => trans('seo.launchpad.title', ['launchpad' => $launchpad->name])])
+            ->addMeta('og:description',['content' => trans('seo.launchpad.description', ['launchpad' => $launchpad->name])])
+            ->addMeta('og:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:url', ['content' => route('launchpad', ['launchpad' => $launchpad->id, 'slug'=> $launchpad->pad ])])
+            ->addMeta('og:type', ['content' => 'website'])
+            ->includePackages('twitter');
+
         $today = Carbon::now();
         $listings = $launchpad->listings()->with('project')->has('project')
             ->orderByRaw("
@@ -58,6 +107,21 @@ class HomeController extends Controller
 
     public function project(Project $project, $slug): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
+        $this->meta
+            ->prependTitle(trans('seo.project.title', ['project' => Str::title($project->name)]))
+            ->setDescription(trans('seo.project.description', ['project' => Str::title($project->name)]))
+            ->setKeywords(trans('seo.project.keywords', ['project' => Str::title($project->name)]))
+            ->addMeta('twitter:card', ['content' => 'summary_large_image'])
+            ->addMeta('twitter:title',['content' => trans('seo.project.title', ['project' => Str::title($project->name)])])
+            ->addMeta('twitter:description',['content' => trans('seo.project.description', ['project' => Str::title($project->name)])])
+            ->addMeta('twitter:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:title',['content' => trans('seo.project.title', ['project' => Str::title($project->name)])])
+            ->addMeta('og:description',['content' => trans('seo.project.description', ['project' => Str::title($project->name)])])
+            ->addMeta('og:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:url', ['content' => route('project', ['project' => $project->id, 'slug'=> $project->token ])])
+            ->addMeta('og:type', ['content' => 'website'])
+            ->includePackages('twitter');
+
         if ($project->token !== $slug) abort(404);
         $today = Carbon::now();
 

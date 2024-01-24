@@ -4,6 +4,7 @@ namespace App\View\Components;
 
 use App\Models\Launchpad;
 use App\Models\Project;
+use Butschster\Head\Contracts\MetaTags\MetaInterface;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -12,12 +13,14 @@ use Illuminate\View\Component;
 
 class ListingComponent extends Component
 {
+
+    protected MetaInterface $meta;
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct(MetaInterface $meta)
     {
-        //
+        $this->meta = $meta;
     }
 
     /**
@@ -25,6 +28,22 @@ class ListingComponent extends Component
      */
     public function render(): View|Closure|string
     {
+
+        $this->meta
+            ->prependTitle(trans('seo.listings.title'))
+            ->setDescription(trans('seo.listings.description'))
+            ->setKeywords(trans('seo.listings.keywords'))
+            ->addMeta('twitter:card', ['content' => 'summary_large_image',])
+            ->addMeta('twitter:title',['content' => trans('seo.listings.title')])
+            ->addMeta('twitter:description',['content' => trans('seo.listings.description')])
+            ->addMeta('twitter:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:title',['content' => trans('seo.listings.title')])
+            ->addMeta('og:description',['content' => trans('seo.listings.description')])
+            ->addMeta('og:image', ['content' => asset('assets/img/logo.png')])
+            ->addMeta('og:url', ['content' => route('listings')])
+            ->addMeta('og:type', ['content' => 'website'])
+            ->includePackages('twitter');
+
         $today = Carbon::now();
         $token = request()->token;
         $network = request()->network;
@@ -85,6 +104,8 @@ class ListingComponent extends Component
             $sub->raise = $product->listings->first()->raise;
             $projects[$key] = $sub;
         }
+
+        $this->meta->setPaginationLinks($projects);
 
         return view('components.listing-component',[
             'projects' => $projects,

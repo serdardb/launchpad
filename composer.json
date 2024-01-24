@@ -9,6 +9,7 @@
         "ext-curl": "*",
         "ext-dom": "*",
         "abraham/twitteroauth": "^6.2",
+        "butschster/meta-tags": "^2.3",
         "guzzlehttp/guzzle": "^7.8",
         "laravel-lang/json-fallback": "^2.0",
         "laravel-lang/locale-list": "^1.3",
