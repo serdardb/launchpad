@@ -25,19 +25,20 @@ class ListingComponent extends Component
      */
     public function render(): View|Closure|string
     {
-        $today = Carbon::today();
+        $today = Carbon::now();
         $token = request()->token;
         $network = request()->network;
         $launchpadId = request('launchpad');
 
         $projects = Project::select('projects.*')
-            ->leftJoin(DB::raw('(SELECT * FROM listings WHERE start_date >= "'.$today.'" OR start_date IS NULL) as filtered_listings'), function($join) {
-                $join->on('projects.id', '=', 'filtered_listings.project_id');
+            ->leftJoin(DB::raw('(SELECT * FROM listings WHERE end_date >= "'.$today.'" OR end_date IS NULL) as filtered_listings'), function($join) {
+                $join->on('projects.id', '=', 'filtered_listings.project_id')->where('status', 1);
             })
             ->selectRaw('MIN(COALESCE(filtered_listings.start_date)) as earliest_start_date')
+            ->selectRaw('MIN(COALESCE(filtered_listings.end_date)) as earliest_end_date')
             ->groupBy('projects.id')
-            ->orderByRaw('ISNULL(earliest_start_date) ASC')
-            ->orderBy('earliest_start_date', 'ASC')
+            ->orderByRaw('ISNULL(earliest_end_date) ASC')
+            ->orderBy('earliest_end_date', 'ASC')
             ->when($token, function ($query) use ($token) {
                 return $query->where(function($query) use ($token) {
                     $query->where('projects.name', 'LIKE', "%$token%")
@@ -53,15 +54,15 @@ class ListingComponent extends Component
                 });
             })
             ->whereHas('listings', function ($query) use($today) {
-                return $query->whereNull('start_date')
-                    ->orWhere('start_date', '>=', $today); // Sonra tarihe göre artan sıralama;
+                return $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', $today); // Sonra tarihe göre artan sıralama;
             })
             ->with([
                 'listings' => function($query) use($today) {
                     return $query->whereNull('start_date')
-                        ->orWhere('start_date', '>=', $today)
-                        ->orderByRaw('ISNULL(start_date) ASC') // Önce null olmayanlar
-                        ->orderBy('start_date', 'ASC')
+                        ->orWhere('end_date', '>=', $today)
+                        ->orderByRaw('ISNULL(end_date) ASC') // Önce null olmayanlar
+                        ->orderBy('end_date', 'ASC')
                         ->with('launchpad');
                 }
             ])->has('listings')

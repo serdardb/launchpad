@@ -55,9 +55,10 @@ class Polkastarter extends LaunchpadAbstract
 
             $this->product->run([
                 'launchpad' => class_basename(self::class),
-                'price' => count($data['content']['Sales']) ? $data['content']['Sales'][0] : 'TBA',
-                'raise' => $data['content']['totalRaise'] ?? 0,
+                'price' => count($data['content']['Sales']) ? $data['content']['Sales'][0] : null,
+                'raise' => $data['content']['totalRaise'] ?? null,
                 'offering_type' => $data['type'],
+                'url' => 'https://polkastarter.com/projects/' . $data['slug'],
                 'start_date' => $data['content']['startDate'] ?? 'TBA',
                 'end_date' => $data['content']['endDate'] ?? 'TBA',
                 'product' => $product

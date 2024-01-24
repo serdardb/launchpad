@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Launchpad;
-use App\Models\LaunchpadProduct;
+use App\Models\Listing;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,14 +17,15 @@ class ProductService
         $this->model = $product;
     }
 
-    public function product($name, $token, $network, $icon = null, $website = null)
+    public function product($name, $token, $network = null, $icon = null, $website = null)
     {
         $name = Str::of($name)->lower();
         $token = $this->token_clear(Str::of($token)->lower());
-        $network = $this->network_mapping(Str::of($network)->lower());
+        if ($network) {
+            $network = $this->network_mapping(Str::of($network)->lower());
+        }
         $product = $this->model
             ->where('token', $token)
-            ->where('network', $network)
             ->first();
         if (!$product) {
             $product = $this->model->create([
@@ -34,6 +35,11 @@ class ProductService
                 'image' => $icon,
                 'website' => $website,
             ]);
+        } else {
+            if ($network and !$product->network) $product->network = $network;
+            if ($icon and !$product->image) $product->image = $icon;
+            if ($website and !$product->website) $product->website = $website;
+            $product->save();
         }
         return $product;
     }
@@ -46,8 +52,9 @@ class ProductService
     private function launchpad_product($launchpad, $project, $array): void
     {
         $price = $array['price'];
-        $raise = intval($array['raise']);
-        //$offeringType = $array['offering_type'];
+        $raise = $array['raise'];
+        $offeringType = $array['offering_type'];
+        $url = $array['url'] ?? null;
         $startDate = null; $endDate = null;
         if (isset($array['start_date']) and  Str::upper($array['start_date']) !== "TBA") $startDate = $array['start_date'];
         if (isset($array['end_date']) and  Str::upper($array['end_date']) !== "TBA") $endDate = $array['end_date'];
@@ -72,7 +79,8 @@ class ProductService
                 'project_id' => $project->id,
                 'price' => $price,
                 'raise' => $raise,
-                //'offering_type' => $offeringType,
+                'offering_type' => $offeringType,
+                'url' => $url,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'created_at' => now(),
@@ -101,6 +109,7 @@ class ProductService
             'price' => $array['price'],
             'raise' => $array['raise'],
             'offering_type' => $array['offering_type'],
+            'url' => $array['url'] ?? null,
             'start_date' => $array['start_date'],
             'end_date' => $array['end_date'],
         ]);
@@ -229,9 +238,18 @@ class ProductService
     public function check($products, $launchpadKey): void
     {
         $launchpad = $this->launchpad($launchpadKey);
+        Listing::where('launchpad_id', $launchpad->id)
+            ->whereNotIn('project_id', $products->pluck('id'))->update([
+                'status' => 0
+            ]);
+    }
+
+    /*public function check($products, $launchpadKey): void
+    {
+        $launchpad = $this->launchpad($launchpadKey);
         $data = LaunchpadProduct::where('launchpad_id', $launchpad->id)
             ->whereNotIn('product_id',$products->pluck('id'))->update([
                 'status' => 0
             ]);
-    }
+    }*/
 }

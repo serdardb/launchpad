@@ -28,10 +28,10 @@ class Aitechpad extends LaunchpadAbstract
             foreach ($project['events'] as $event) {
                 if ($event['type'] === "Crowdfunding") {
                     if (intval($event['start_date']) < time()) continue;
+                    if (str_contains($event['name'], 'Test IDO')) continue;
 
                     $price = floatval(str_replace(',','.', $event['token_price']));
-                    $totalPrice = intval(str_replace(',','',$event['total_allocation']));
-                    $raise = $totalPrice / $price;
+                    $raise = intval(str_replace(',','',str_replace('.','',$event['total_allocation'])));
 
                     $product = $this->product->product(
                         $name,
@@ -47,6 +47,7 @@ class Aitechpad extends LaunchpadAbstract
                         'price' => $price,
                         'raise' => $raise,
                         'offering_type' => 'public',
+                        'url' => 'https://www.aitechpad.io/project/' . $project['slug'],
                         'start_date' => date('Y-m-d H:i:s', intval($event['start_date'])),
                         'end_date' => date('Y-m-d H:i:s', intval($event['start_date'])),
                         'product' => $product

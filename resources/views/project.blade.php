@@ -31,6 +31,29 @@
                     <div class="cs-tab_content">
                         <div id="listings" class="cs-tab active">
                             <ul class="cs-activity_list cs-mp0">
+                                <li>
+
+                                    <div class="cs-card cs-style5 cs-style4 cs-type1 cs-white_bg cs-box_shadow">
+                                        <div class="col-2">
+                                            <div class="cs-card_media">
+                                                <h3>Launchpad</h3>
+                                            </div>
+                                        </div>
+                                        <div class="col-2 text-center">
+                                            <h3>Start Date</h3>
+                                        </div>
+                                        <div class="col-2 text-center">
+                                            <h3>End Date</h3>
+                                        </div>
+                                        <div class="col-2 text-center">
+                                            <h3>Price</h3>
+                                        </div>
+                                        <div class="col-2 text-center">
+                                            <h3>Raise</h3>
+                                        </div>
+                                        <div class="col-2 d-flex justify-content-end text-right"></div>
+                                    </div>
+                                </li>
                                 @foreach($listings as $listing)
                                 <li>
                                     <div class="cs-card cs-style5 cs-style4 cs-type1 cs-white_bg cs-box_shadow">
@@ -45,15 +68,29 @@
                                             </div>
                                         </div>
                                         <div class="col-2 text-center">
-                                            <img style="border-radius: 50%;margin: 0 auto;width: 28px; height: 28px" src="https://icons.llamao.fi/icons/chains/rsz_{!! $project->network !!}.jpg">
-                                        </div>
-                                        <div class="col-2 text-center">
                                             <div class="cs-card_media_right">
-                                                <h3>{!! $listing->start_date ?? 'TBA' !!}</h3>
+                                                @if($listing->start_date)
+                                                    <h3>{!! \Carbon\Carbon::createFromDate($listing->start_date)->format('Y-m-d') !!}</h3>
+                                                    <p>{!! \Carbon\Carbon::createFromDate($listing->start_date)->format('H:i') !!}</p>
+                                                    <small>{{ \Carbon\Carbon::createFromDate($listing->start_date)->diffForHumans() }}</small>
+                                                @else
+                                                    <h3>TBA</h3>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="col-2 text-center">
-                                            <p><strong>{{ trans('project.price') }}: </strong>${!! $listing->price !!}</p>
+                                            <div class="cs-card_media_right">
+                                                @if($listing->end_date)
+                                                    <h3>{!! \Carbon\Carbon::createFromDate($listing->end_date)->format('Y-m-d') !!}</h3>
+                                                    <p>{!! \Carbon\Carbon::createFromDate($listing->end_date)->format('H:i') !!}</p>
+                                                    <small>{{ \Carbon\Carbon::createFromDate($listing->end_date)->diffForHumans() }}</small>
+                                                @else
+                                                    <h3>TBA</h3>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-2 text-center">
+                                            <p><strong>{{ trans('project.price') }}: </strong>{!! ($listing->price) !!}</p>
                                         </div>
                                         <div class="col-2 text-center">
                                             <p><strong>{{ trans('project.raise') }}: </strong>${!! number_format($listing->raise) !!}</p>

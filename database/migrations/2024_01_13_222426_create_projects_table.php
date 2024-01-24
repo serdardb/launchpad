@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('token');
-            $table->string('network');
-            $table->string('image');
+            $table->string('network')->nullable();
+            $table->string('image')->nullable();
             $table->text('description')->nullable();
             $table->string('website')->nullable();
             $table->timestamps();

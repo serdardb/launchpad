@@ -24,7 +24,7 @@ class LaunchpadSeeder extends Seeder
             ],
             [
                 'name' => 'Seedify',
-                'url' => 'https://launchpad.seedify.fund/',
+                'url' => 'https://seedify.fund/',
                 'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/8972.png',
                 'pad' => 'seedify',
                 'status' => 1
@@ -45,7 +45,7 @@ class LaunchpadSeeder extends Seeder
             ],
             [
                 'name' => 'Decubate',
-                'url' => 'https://paltform.decubate.com',
+                'url' => 'https://platform.decubate.com/',
                 'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/10563.png',
                 'pad' => 'decubate',
                 'status' => 1
@@ -91,7 +91,64 @@ class LaunchpadSeeder extends Seeder
                 'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/11088.png',
                 'pad' => 'enjinstarter',
                 'status' => 1
+            ],
+            [
+                'name' => 'Poolz',
+                'url' => 'https://www.poolz.finance/',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/8271.png',
+                'pad' => 'poolz',
+                'status' => 1
+            ],
+            [
+                'name' => 'Redkitepad',
+                'url' => 'https://redkitepad.com/#/dashboard',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/8617.png',
+                'pad' => 'redkitepad',
+                'status' => 1
+            ],
+            [
+                'name' => 'Kommunitas',
+                'url' => 'https://launchpad.kommunitas.net/',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/10403.png',
+                'pad' => 'kommunitas',
+                'status' => 1
+            ],
+            [
+                'name' => 'Avalaunch',
+                'url' => 'https://avalaunch.app/launchpad',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/9797.png',
+                'pad' => 'avalaunch',
+                'status' => 1
+            ],
+            [
+                'name' => 'Aipad',
+                'url' => 'https://app.aipad.tech/api/projects',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/23300.png',
+                'pad' => 'aipad',
+                'status' => 0
+            ],
+            [
+                'name' => 'Trustswap',
+                'url' => 'https://dashboard.trustswap.org/app/launchpads',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/5829.png',
+                'pad' => 'trustswap',
+                'status' => 0
+            ],
+            [
+                'name' => 'Arbipad',
+                'url' => 'https://www.arbipad.com/projects',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/25152.png',
+                'pad' => 'arbipad',
+                'status' => 1
+            ],
+            [
+                'name' => 'Solanium',
+                'url' => 'https://www.solanium.io/dashboard',
+                'image' => 'https://s2.coinmarketcap.com/static/img/coins/64x64/9741.png',
+                'pad' => 'solanium',
+                'status' => 1
             ]
+
         ];
         foreach ($launchpads as $launchpad)
         {

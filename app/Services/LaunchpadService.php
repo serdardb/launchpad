@@ -5,6 +5,7 @@ namespace App\Services;
 class LaunchpadService
 {
     protected array $launchpads = [];
+    protected array $prepareData = [];
 
     public function addLaunchpad($launchpad): void
     {
@@ -58,6 +59,9 @@ class LaunchpadService
         if ($callProcess) {
             // Process fonksiyonlarını çağır
             foreach ($this->launchpads as $index => $launchpad) {
+                if (isset($this->prepareData[$index])) {
+                    $launchpad->prepareData = $this->prepareData[$index];
+                }
                 $launchpad->process($responses[$index]['response'], $responses[$index]['request'], $responses[$index]['time']);
             }
         }
@@ -66,6 +70,7 @@ class LaunchpadService
             foreach ($this->launchpads as $index => $launchpad) {
                 if (isset($responses[$index])) {
                     $launchpad->prepareData = $responses[$index];
+                    $this->prepareData[$index] = $responses[$index];
                 }
             }
         }

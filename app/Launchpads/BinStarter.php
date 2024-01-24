@@ -12,6 +12,17 @@ class BinStarter extends LaunchpadAbstract
         3 => 'ethereum',
         4 => 'avalanche'
     ];
+
+    public function prepare(): array
+    {
+        return [
+            'url' => 'https://bsr.binstarter.io/api/ido/projects/open-now',
+            //'headers' => [],
+            'post' => "",
+            //'options' => []
+        ];
+    }
+
     // Settings required for data retrieval process
     public function send(): array
     {
@@ -26,22 +37,35 @@ class BinStarter extends LaunchpadAbstract
     // Processing of retrieved data
     public function process($response, $request, $time): void
     {
-        $response = json_decode($response, true);
         $activeProducts = collect([]);
+        $prepareDate = $this->prepareData['response'];
+        $prepareDate = json_decode($prepareDate, true);
+        $this->render($prepareDate, $activeProducts);
+        $response = json_decode($response, true);
+        $this->render($response, $activeProducts);
+        $this->product->check($activeProducts, class_basename(self::class));
+    }
 
-        foreach ($response as $item) {
+    private function getNetwork($id)
+    {
+        return $this->chainIds[$id] ?? 'undefined';
+    }
+
+    private function render($data, $activeProducts)
+    {
+        foreach ($data as $item) {
             $name = $item['projectName'];
             $token = $item['tokenSymbol'];
             $network = $this->getNetwork($item['projectNetwork']);
             $image = 'https://bsr.binstarter.io' . $item['projectLogo'];
             $website = $item['website'];
             $price = $item['tokenPrice'];
-            $raise = $item['totalRaise'] / $item['tokenPrice'];
+            $raise = $item['totalRaise'];
             $offering_type = 'Public';
             $start_date = "TBA";
             $end_date = 'TBA';
-            if ($item['startTime']) $start_date = str_replace('T', ' ' , $item['startTime']);
-            if ($item['endTime']) $end_date = str_replace('T', ' ' , $item['endTime']);
+            if ($item['startTime']) $start_date = str_replace('T', ' ', $item['startTime']);
+            if ($item['endTime']) $end_date = str_replace('T', ' ', $item['endTime']);
             if (Str::lower($this->product->token_clear($token)) === "patex") {
                 $network = 'ethereum';
             }
@@ -58,18 +82,12 @@ class BinStarter extends LaunchpadAbstract
                 'price' => $price,
                 'raise' => $raise,
                 'offering_type' => $offering_type,
+                'url' => 'https://bsr.binstarter.io/ido/project/' . $item['id'],
                 'start_date' => $start_date,
                 'end_date' => $end_date,
                 'product' => $product
             ]);
 
         }
-
-        $this->product->check($activeProducts, class_basename(self::class));
-    }
-
-    private function getNetwork($id)
-    {
-        return $this->chainIds[$id] ?? 'undefined';
     }
 }

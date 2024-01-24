@@ -29,7 +29,7 @@ class HomeController extends Controller
     public function project(Project $project, $slug): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
         if ($project->token !== $slug) abort(404);
-        $today = Carbon::today();
+        $today = Carbon::now();
 
         $listings = $project->listings()->with('launchpad')->has('launchpad')
             ->orderByRaw("
@@ -37,9 +37,10 @@ class HomeController extends Controller
                     WHEN start_date IS NULL THEN 1
                     WHEN start_date < '{$today}' THEN 2
                     ELSE 0
-                END ASC,
+                END DESC,
                 ABS(DATEDIFF(start_date, '{$today}'))
-            ")->get();
+            ")
+            ->get();
         return view('project', [
             'project' => $project,
             'listings' => $listings

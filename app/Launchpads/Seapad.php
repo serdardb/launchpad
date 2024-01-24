@@ -22,7 +22,7 @@ class Seapad extends LaunchpadAbstract
 
         foreach ($response['data']['items'] as $item) {
 
-            $startDate = $endDate = 'TBA';
+            $startDate = $endDate = null;
             if (isset($item['timelines'])) {
                 $endCarbon =  Carbon::parse($item['timelines']['end']);
                 if ($endCarbon->isPast()) continue;
@@ -40,9 +40,10 @@ class Seapad extends LaunchpadAbstract
             $activeProducts->push($product);
             $this->product->run([
                 'launchpad' => class_basename(self::class),
-                'price' => $item['more_info']['token_price'],
-                'raise' => $item['more_info']['target_fund'],
+                'price' => $item['more_info']['token_price'] ?? null,
+                'raise' => $item['more_info']['target_fund'] ?? null,
                 'offering_type' => $item['sales_type'],
+                'url' => 'https://app.seapad.fund/projects/' . $item['_id'],
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'product' => $product

@@ -27,12 +27,12 @@ class Decubate extends LaunchpadAbstract
             $network = $project['token']['network'];
             $image = 'https://platform-s3-publicread.s3.eu-central-1.amazonaws.com/'.$project['id'].'/'.$project['square_logo'];
             foreach ($project['events'] as $event) {
+                if (str_contains($event['name'], 'Test IDO')) continue;
                 if ($event['type'] === "Crowdfunding") {
                     if (intval($event['start_date']) < time()) continue;
 
                     $price = floatval(str_replace(',','.', $event['token_price']));
-                    $totalPrice = intval(str_replace(',','',$event['total_allocation']));
-                    $raise = $totalPrice / $price;
+                    $raise = intval(str_replace(',','',str_replace('.','',$event['total_allocation'])));
 
                     $product = $this->product->product(
                         $name,
@@ -47,7 +47,8 @@ class Decubate extends LaunchpadAbstract
                         'launchpad' => class_basename(self::class),
                         'price' => $price,
                         'raise' => $raise,
-                        'offering_type' => 'public',
+                        'offering_type' => 'Public',
+                        'url' => 'https://platform.decubate.com/project/' . $project['slug'],
                         'start_date' => date('Y-m-d H:i:s', intval($event['start_date'])),
                         'end_date' => date('Y-m-d H:i:s', intval($event['start_date'])),
                         'product' => $product

@@ -19,10 +19,18 @@ class Wepad extends LaunchpadAbstract
     {
         $response = json_decode((string)$response, true);
         $upcoming = $response['data']['upcoming'];
+        $live = $response['data']['live'];
 
         $activeProducts = collect([]);
+        $this->render($upcoming, $activeProducts);
+        $this->render($live, $activeProducts);
 
-        foreach ($upcoming as $item) {
+        $this->product->check($activeProducts, class_basename(self::class));
+    }
+
+    private function render($data, $activeProducts)
+    {
+        foreach ($data as $item) {
 
             $name = $item['title'];
             $token = $item['ticker'];
@@ -31,17 +39,16 @@ class Wepad extends LaunchpadAbstract
             $website = null;
             $metrics = collect($item['metrics']);
             $raisePrice = $metrics->where('key', '=', 'Fundraise goal')->first();
-            $raisePrice = $raisePrice ? intval(str_replace(',', '',$raisePrice['value'])) : 0;
-            $tokenPrice = $metrics->where('key', '=','Price per token')->first();
-            $price = $tokenPrice ? floatval(str_replace(',', '',$tokenPrice['value'])) : 0;
-            $raise  = $raisePrice / $price;
+            $raise = $raisePrice ? intval(str_replace(',', '', $raisePrice['value'])) : 0;
+            $tokenPrice = $metrics->where('key', '=', 'Price per token')->first();
+            $price = $tokenPrice ? floatval(str_replace(',', '', $tokenPrice['value'])) : 0;
             $offering_type = 'public';
-            $start_date = 'TBA';
+            $start_date = null;
             if ($item['startsAt']) {
                 $carbonInstance = new Carbon($item['startsAt']);
                 $start_date = $carbonInstance->format('Y-m-d H:i:s');
             }
-            $end_date = 'TBA';
+            $end_date = null;
             if ($item['endsAt']) {
                 $carbonInstance = new Carbon($item['endsAt']);
                 $end_date = $carbonInstance->format('Y-m-d H:i:s');
@@ -61,12 +68,11 @@ class Wepad extends LaunchpadAbstract
                 'price' => $price,
                 'raise' => $raise,
                 'offering_type' => $offering_type,
+                'url' => 'https://wepad.io/project/' . $item['slug'],
                 'start_date' => $start_date,
                 'end_date' => $end_date,
                 'product' => $product
             ]);
         }
-
-        $this->product->check($activeProducts, class_basename(self::class));
     }
 }

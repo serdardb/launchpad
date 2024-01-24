@@ -45,21 +45,24 @@ class Poolz extends LaunchpadAbstract
         foreach ($response as $item) {
 
             $name = $item['Name'];
+            if (str_contains($name, 'NOT IDO')) continue;
             $token = str_replace('$', '', trim($item['VisualText']['Tokenomics']['Symbol']));
             $network = $this->product->network_mapping($item['chain_setting']['chainMainCoin']);
             $image = 'https://poolzfinancedata.com/cdn-cgi/image/format=auto' . $item['Logo']['url'];
             $website = $item['VisualText']['SmartLinks'][0]['URL'];
 
-            $price = $item['VisualText']['Tokenomics']['USDPrice'] ?? 'TBA';
+            $price = $item['VisualText']['Tokenomics']['USDPrice'] ?? null;
             $raisePrice = $item['VisualText']['Tokenomics']['TotalRaise'];
-            $raisePrice = str_replace('$', '', $raisePrice);
-            $raisePrice = str_replace(',','',$raisePrice);
-            $raisePrice = intval($raisePrice);
-            $raise = ($price !== 'TBA') ? $raisePrice / $price : 'TBA';
+            $raise = null;
+            if ($raisePrice !== 'TBA') {
+                $raisePrice = str_replace('$', '', $raisePrice);
+                $raisePrice = str_replace(',','',$raisePrice);
+                $raise = intval($raisePrice);
+            }
 
             $offering_type = $item['ido_badge']['Name'];
-            $start_date = "TBA";
-            $end_date = 'TBA';
+            $start_date = null;
+            $end_date = null;
             try{
                 $dateStart = new DateTime($item['StartTime']);
                 $start_date = $dateStart->format('Y-m-d H:i:s');
@@ -82,6 +85,7 @@ class Poolz extends LaunchpadAbstract
                 'price' => $price,
                 'raise' => $raise,
                 'offering_type' => $offering_type,
+                'url' => 'https://www.poolz.finance/project-details/about/' . $item['id'],
                 'start_date' => $start_date,
                 'end_date' => $end_date,
                 'product' => $product

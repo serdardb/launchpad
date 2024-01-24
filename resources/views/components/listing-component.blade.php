@@ -50,6 +50,33 @@
                 </form>
                 <div class="cs-height_10"></div>
             </div>
+
+            <div class="col-xl-12">
+                <div class="cs-card cs-style5 cs-style4 cs-type1 cs-white_bg cs-box_shadow row">
+                    <div class="col-2">
+                        <div class="cs-card_media">
+                            <div class="cs-card_media_right">
+                                <h3>Project</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 text-center">
+                        <h3>Launchpads</h3>
+                    </div>
+                    <div class="col-2 text-center">
+                        <h3>Start Date</h3>
+                    </div>
+                    <div class="col-2 text-center">
+                        <h3>End Date</h3>
+                    </div>
+                    <div class="col-2 text-center">
+                        <h3>Price - Raise</h3>
+                    </div>
+                    <div class="col-2 d-flex justify-content-end text-right"></div>
+                </div>
+                <div class="cs-height_15 cs-height_lg_15"></div>
+            </div>
+
             @foreach($projects as $project)
 
                 <div class="col-xl-12">
@@ -65,7 +92,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 text-center">
+                        <div class="col-2 text-center d-none">
                             <img style="border-radius: 50%;margin: 0 auto;width: 28px; height: 28px" src="https://icons.llamao.fi/icons/chains/rsz_{!! $project->network !!}.jpg">
                         </div>
                         <div class="col-2 text-center">
@@ -80,16 +107,28 @@
                         <div class="col-2 text-center">
                             <div class="cs-card_media_right">
                                 @if($project->earliest_start_date)
-                                <h3>{!! $project->earliest_start_date !!}</h3>
-                                <p class="d-none">10:00</p>
+                                    <h3>{!! \Carbon\Carbon::createFromDate($project->earliest_start_date)->format('Y-m-d') !!}</h3>
+                                    <p>{!! \Carbon\Carbon::createFromDate($project->earliest_start_date)->format('H:i') !!} UTC</p>
+                                    <small>{{ \Carbon\Carbon::createFromDate($project->earliest_start_date)->diffForHumans() }}</small>
                                 @else
                                     <h3>TBA</h3>
                                 @endif
                             </div>
                         </div>
                         <div class="col-2 text-center">
-                            <p><strong>{{ trans('project.price') }}: </strong>${!! $project->price !!}</p>
-                            <p><strong>{{ trans('project.raise') }}: </strong>${!! $project->raise !!}</p>
+                            <div class="cs-card_media_right">
+                                @if($project->earliest_end_date)
+                                    <h3>{!! \Carbon\Carbon::createFromDate($project->earliest_end_date)->format('Y-m-d') !!}</h3>
+                                    <p>{!! \Carbon\Carbon::createFromDate($project->earliest_end_date)->format('H:i') !!} UTC</p>
+                                    <small>{{ \Carbon\Carbon::createFromDate($project->earliest_end_date)->diffForHumans() }}</small>
+                                @else
+                                    <h3>TBA</h3>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-2 text-center">
+                            <p><strong>{{ trans('project.price') }}: </strong>{{ $project->price }}</p>
+                            <p><strong>{{ trans('project.raise') }}: </strong>{!! $project->raise ? '$' . number_format($project->raise) : 'TBA' !!}</p>
                         </div>
                         <div class="col-2 d-flex justify-content-end text-right">
                             <a href="{{ route('project', ['project' => $project->id, 'slug' => $project->token]) }}" class="cs-color2 cs-hero_btn cs-style1" style="padding: 5px 20px"><span>{{ trans('project.view') }}</span></a>

@@ -2,12 +2,12 @@
 
 namespace App\Launchpads;
 
-class Chaingpt extends LaunchpadAbstract
+class Redkitepad extends LaunchpadAbstract
 {
     public function prepare(): array
     {
         return [
-            'url' => 'https://padapi.chaingpt.org/pools/v3/next-to-launch-pools'
+            'url' => 'https://redkite-api.polkafoundry.com/pools/v3/next-to-launch-pools'
         ];
     }
 
@@ -15,7 +15,7 @@ class Chaingpt extends LaunchpadAbstract
     public function send(): array
     {
         return [
-            'url' => 'https://padapi.chaingpt.org/pools/v3/upcoming-pools'
+            'url' => 'https://redkite-api.polkafoundry.com/pools/v3/upcoming-pools'
         ];
     }
 
@@ -24,31 +24,44 @@ class Chaingpt extends LaunchpadAbstract
     {
         $activeProducts = collect([]);
         $response = json_decode($response, true);
-        $data = $response['data']['data'];
-        $this->render($data,$activeProducts);
+        $this->render($response['data']['data'],$activeProducts);
+
         $prepareResponse = json_decode($this->prepareData['response'], true);
         $this->render($prepareResponse['data']['data'],$activeProducts);
+
         $this->product->check($activeProducts, class_basename(self::class));
+
     }
 
-    public function render($data,$activeProducts) {
+    private function render($data, $activeProducts)
+    {
         foreach ($data as $item)
         {
-            $name = $item['title'];
+            $name = str_replace('IDO','',$item['title']);
+            $name = str_replace('Private Sale', '',$name);
+            $name = trim($name);
             $token = $item['symbol'];
             $network = $item['network_available'];
             $image = $item['token_images'];
             $website = $item['website'];
-            $price = $item['token_conversion_rate'];
+            $price = $item['ether_conversion_rate'];
             $raise = ceil(intval(floatval($item['total_sold_coin']) * floatval($price)));
-            $offering_type = $item['relationship_type'];
+            $offering_type = intval($item['is_private']) === 1 ? 'Private' : 'Public';
             $start_date = null;
-            if ($item['actual_finish_time']) {
-                $start_date =  date('Y-m-d H:i:s', intval($item['actual_finish_time']));
-            } else if ($item['start_time']) {
+
+            if ($item['start_time']) {
                 $start_date =  date('Y-m-d H:i:s', intval($item['start_time']));
+            } else if ($item['start_join_pool_time']) {
+                $start_date =  date('Y-m-d H:i:s', intval($item['start_join_pool_time']));
             }
-            $end_date = $item['finish_time'] ? date('Y-m-d H:i:s', intval($item['finish_time'])) : null;
+
+            $end_date = null;
+            if ($item['finish_time']) {
+                $end_date =  date('Y-m-d H:i:s', intval($item['finish_time']));
+            }
+            else if ($item['end_join_pool_time']) {
+                $end_date =  date('Y-m-d H:i:s', intval($item['end_join_pool_time']));
+            }
 
             $product = $this->product->product(
                 $name,
@@ -64,7 +77,7 @@ class Chaingpt extends LaunchpadAbstract
                 'price' => $price,
                 'raise' => $raise,
                 'offering_type' => $offering_type,
-                'url' => 'https://pad.chaingpt.org/buy-token/' . $item['id'],
+                'url' => 'https://redkitepad.com/#/buy-token/' . $item['id'],
                 'start_date' => $start_date,
                 'end_date' => $end_date,
                 'product' => $product

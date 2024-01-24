@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('listings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained();
-            $table->foreignId('launchpad_id')->constrained();
-            $table->string('price')->nullable();
-            $table->string('raise')->nullable();
-            $table->date('start_date')->nullable();
-            $table->date('end_date')->nullable();
+            $table->foreignId('project_id')->constrained()->onDelete('cascade');
+            $table->foreignId('launchpad_id')->constrained()->onDelete('cascade');
+            $table->double('price')->nullable();
+            $table->double('raise')->nullable();
+            $table->string('offering_type')->default('public');
+            $table->string('url')->nullable();
+            $table->smallInteger('status')->default(1);
+            $table->dateTime('start_date')->nullable();
+            $table->dateTime('end_date')->nullable();
             $table->timestamps();
         });
     }
