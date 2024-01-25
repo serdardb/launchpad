@@ -75,10 +75,14 @@ class Enjinstarter extends LaunchpadAbstract
             $offering_type = 'Public';
             $start_date = null;
             $end_date = null;
-            if ($item['guaranteedStartDateTime']) $start_date = str_replace('T', ' ' , $item['guaranteedStartDateTime']);
-            if ($item['guaranteedEndDateTime']) $end_date = str_replace('T', ' ' , $item['guaranteedEndDateTime']);
-            $start_date = trim($start_date, 'Z');
-            $end_date = trim($end_date, 'Z');
+            if ($item['guaranteedStartDateTime']) {
+                $start_date = str_replace('T', ' ', $item['guaranteedStartDateTime']);
+                $start_date = trim($start_date, 'Z');
+            }
+            if ($item['guaranteedEndDateTime']) {
+                $end_date = str_replace('T', ' ', $item['guaranteedEndDateTime']);
+                $end_date = trim($end_date, 'Z');
+            }
 
             $product = $this->product->product(
                 $name,
